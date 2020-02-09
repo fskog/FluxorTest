@@ -1,0 +1,22 @@
+﻿@using Blazor.Fluxor
+@using Store.Timer
+@inject IState<TimerState> TimerState
+@inherits Blazor.Fluxor.Components.FluxorComponent
+
+@(TimerState.Value.Timer.ElapsedFormatted) 
+
+@code { 
+    private System.Timers.Timer updateTimer;
+    protected override void OnInitialized()
+    {
+        updateTimer = new System.Timers.Timer(1000);
+        updateTimer.Elapsed += OnTimedEvent;
+        updateTimer.AutoReset = true;
+        updateTimer.Enabled = true;
+    }
+
+    private void OnTimedEvent(Object source, EventArgs e)
+    {
+        StateHasChanged();
+    }
+}

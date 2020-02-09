@@ -1,0 +1,44 @@
+﻿@using Blazor.Fluxor
+@using Store.Timer
+@inject IState<TimerState> TimerState
+@inject IDispatcher Dispatcher
+@inherits Blazor.Fluxor.Components.FluxorComponent
+
+<div class="container fixed-bottom col-md-8 col-sm-12 mb-3">
+    <div class="row justify-content-around text-white sticky-nav">
+        <a class="col-auto text-white" @onclick="ToggleTimer">
+            <div class="rounded-circle d-flex square-50p @(isRunning ? "bg-danger" : "bg-success")
+                 justify-content-center align-items-center">
+                <span class="oi @(isRunning ? "oi-media-stop" : "oi-media-play icon-play")" aria-hidden="true"></span>
+            </div>
+        </a>
+        <NavLink class="col-auto text-white" href="" Match="NavLinkMatch.All">
+            <div class="rounded-circle d-flex square-50p bg-primary
+                 justify-content-center align-items-center">
+                <span class="oi oi-home icon-home" aria-hidden="true"></span>
+            </div>
+        </NavLink>
+        <NavLink class="col-auto text-white" href="log">
+            <div class="rounded-circle d-flex square-50p bg-primary
+                 justify-content-center align-items-center">
+                <span class="oi oi-list icon-list" aria-hidden="true"></span>
+            </div>
+        </NavLink>
+        <NavLink class="col-auto text-white" href="settings">
+            <div class="rounded-circle d-flex square-50p bg-primary
+                 justify-content-center align-items-center">
+                <span class="oi oi-cog icon-cog" aria-hidden="true"></span>
+            </div>
+        </NavLink>
+    </div>
+</div>
+
+@code {
+    bool isRunning => TimerState.Value.Timer.IsRunning;
+
+    private void ToggleTimer()
+    {
+        if (isRunning) Dispatcher.Dispatch(new StopTimerAction(TimerState.Value.Timer));
+        else Dispatcher.Dispatch(new StartTimerAction());
+    }
+}

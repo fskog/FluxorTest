@@ -1,0 +1,37 @@
+﻿@using Blazor.Fluxor
+@using Store.Category
+@using Store.Timer
+@inject IState<CategoryState> CategoryState
+@inject IState<TimerState> TimerState
+@inject IDispatcher Dispatcher
+@inherits Blazor.Fluxor.Components.FluxorComponent
+
+<select class="col-auto custom-select bg-transparent w-auto border-0" id="category" @bind=SelectedCategory>
+    
+    <option value="@Models.Category.Empty.SystemId">@Models.Category.Empty.Name</option>
+    
+    @foreach (var category in CategoryState.Value.Categories)
+    {
+        <option value="@category.SystemId">@category.Name</option>
+    }
+</select>
+
+@code {
+    public Guid SelectedCategory
+    {
+        //get => CategoryState.Value.Categories
+        //    .Where(x => x.SystemId == TimerState.Value.Timer.CategorySystemId)
+        //    .Select(y => y.SystemId)
+        //    .FirstOrDefault();
+
+        get => TimerState.Value.Timer.CategorySystemId;
+        set => SetTimerCategory(value);
+    }
+
+    private void SetTimerCategory(Guid systemId)
+    {
+        Dispatcher.Dispatch(new SetTimerCategoryAction(systemId));
+    }
+
+
+}

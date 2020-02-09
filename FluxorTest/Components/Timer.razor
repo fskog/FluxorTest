@@ -1,0 +1,107 @@
+﻿@using Blazor.Fluxor
+@using Store.Timer
+@using Store.Category
+@inject IState<TimerState> TimerState
+@inject IState<CategoryState> CategoryState
+@inject IDispatcher Dispatcher
+@inherits Blazor.Fluxor.Components.FluxorComponent
+
+@if (false)
+{
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <h3>
+                Timer (@(TimerState.Value.Timer.IsRunning ? "Running" : "Stopped"))
+                <span class="badge badge-pill badge-primary"><TimerElapsed /></span>
+            </h3>
+        </div>
+        <div class="row">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" @bind-value="TimerTitle" placeholder="timer title">
+            </div>
+        </div>
+        <div class="row"><CategorySelector></CategorySelector></div>
+        <span class="badge badge-pill badge-light">@CategoryState.Value.GetCategory(TimerState.Value.Timer.CategorySystemId).Name</span>
+
+        <div class="row">
+            <div class="col">
+                <div>Start time</div>
+                <div>@TimerState.Value.Timer.StartTime</div>
+            </div>
+            <div class="col">
+                <div>End time</div>
+                <div>@TimerState.Value.Timer.EndTime</div>
+            </div>
+        </div>
+        <div class="row flex-row">
+            <button class="btn btn-primary w-auto mr-3" @onclick="StartTimer">Start</button>
+            <button class="btn btn-primary w-auto" @onclick="StopTimer">Stop</button>
+        </div>
+    </div>
+}
+
+<div @key=time.SystemId href="#" @onclick:preventDefault class="mb-2 list-group-item list-group-item-action list-group-item-info flex-column align-items-start">
+    <div class="row">
+        <div class="col">
+            <div class="row d-inline-flex">
+                <span class="badge badge-pill badge-primary"><TimerElapsed /></span>
+                <input type="text" class="form-control" @bind-value="TimerTitle" placeholder="timer title">
+            </div>
+            <div class="row">
+                <CategorySelector></CategorySelector>
+                <span class="badge badge-pill badge-light">@CategoryState.Value.GetCategory(time.CategorySystemId).Name</span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button class="btn w-auto @(!time.IsRunning ? "btn-success" : "btn-danger")" @onclick="ToggleTimer">
+                @(!time.IsRunning ? "Start" : "Stop")
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    Models.Timer time;
+
+
+    protected override void OnInitialized()
+    {
+        time = TimerState.Value.Timer;
+    }
+
+    public string TimerTitle
+    {
+        get => TimerState.Value.Timer.Title;
+        set => SetTimerTitle(value);
+    }
+
+    private void SetTimerTitle(string title)
+    {
+        Dispatcher.Dispatch(new SetTimerTitleAction(title));
+    }
+
+    private void ToggleTimer()
+    {
+        if (time.IsRunning)
+        {
+            StopTimer();
+        }
+        else
+        {
+            StartTimer();
+        }
+    }
+
+    private void StartTimer()
+    {
+        Dispatcher.Dispatch(new StartTimerAction());
+    }
+
+    private void StopTimer()
+    {
+        Dispatcher.Dispatch(new StopTimerAction(TimerState.Value.Timer));
+    }
+}
